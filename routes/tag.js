@@ -2,12 +2,12 @@ import {responseClient} from '../util/util.js';
 
 const express = require('express');
 const router = express.Router();
-const Category = require("../models/category")
+const Tag = require("../models/tag")
 
 //新增
-router.post('/add_category', function (req, res, next) {
+router.post('/add_tag', function (req, res, next) {
 
-    let {name, desc} = req.body
+    let {name, desc,icon} = req.body
     if (!name) {
         responseClient(res, 400, 2, "分类名不可为空")
         return;
@@ -16,18 +16,19 @@ router.post('/add_category', function (req, res, next) {
         responseClient(res, 400, 2, '描述不可为空');
         return;
     }
-    Category.findOne({name: name})
+    Tag.findOne({name: name})
         .then(data => {
             if (data) {
                 responseClient(res, 200, 1, '分类已存在！');
                 return;
             }
             //保存到数据库
-            let category = new Category({
+            let tag = new Tag({
                 name,
-                desc
+                desc,
+                icon
             });
-            category.save().then(data => {
+            tag.save().then(data => {
                 responseClient(res, 200, 0, '注册成功', data);
             });
         })
@@ -40,9 +41,9 @@ router.post('/add_category', function (req, res, next) {
 });
 
 //更新分类信息
-router.post("/update_category", function (req, res) {
+router.post("/update_tag", function (req, res) {
     let {id} = req.body
-    Category.update({'id': id}, req.body, function (err, data) {
+    Tag.update({'id': id}, req.body, function (err, data) {
         if (err) {
             responseClient(res, 400, 2, "分类不存在")
 
@@ -56,9 +57,8 @@ router.post("/update_category", function (req, res) {
 })
 
 //分类列表
-router.get("/list_category", function (req, res) {
+router.get("/list_tag", function (req, res) {
     let {name, pageSize, currentPage} = req.query
-    console.log(name, pageSize, currentPage)
     currentPage = parseInt(currentPage)
     pageSize = parseInt(pageSize)
 
@@ -68,7 +68,7 @@ router.get("/list_category", function (req, res) {
     if (name) {
         connection["name"] = name
     }
-    Category.count(connection, function (err, total) {
+    Tag.count(connection, function (err, total) {
         if (err) {
             console.log("Error:" + err);
         } else {
@@ -79,7 +79,7 @@ router.get("/list_category", function (req, res) {
                 create_time: 1,
             };
             // responseClient(res, 200, 0, '返回成功',total);
-            Category.find(connection,fields).skip(skip_num).limit(pageSize).sort(sort).exec(function (err, data) {
+            Tag.find(connection,fields).skip(skip_num).limit(pageSize).sort(sort).exec(function (err, data) {
                 responseClient(res, 200, 0, '返回成功', data, total);
 
             })
@@ -89,10 +89,10 @@ router.get("/list_category", function (req, res) {
 
 })
 //删除分类
-router.post("/delete_category", function (req, res) {
+router.post("/delete_tag", function (req, res) {
     let {ids} = req.body
     console.log(ids, req.body, 77777)
-    Category.remove({'id': {$in: ids}}, function (err, data) {
+    Tag.remove({'id': {$in: ids}}, function (err, data) {
         if (err) {
             console.log("Error:" + err);
         } else {

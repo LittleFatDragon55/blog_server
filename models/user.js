@@ -18,7 +18,7 @@ const adminSchema = new mongoose.Schema({
     github_id: { type: String, default: '' },
 
     // 名字
-    name: { type: String, required: true, default: '' },
+    username: { type: String, required: true, default: '' },
 
     //用户类型 0：博主，1：其他用户 ，2：github， 3：weixin， 4：qq ( 0，1 是注册的用户； 2，3，4 都是第三方授权登录的用户)
     type: { type: Number, default: 1 },

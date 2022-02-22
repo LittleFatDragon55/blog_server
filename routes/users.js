@@ -20,13 +20,13 @@ router.get('/', function (req, res, next) {
     let val = req.query
     // console.log(val)
     console.log(req.query)
-    res.json({name: val})
+    res.json({username: val})
 });
 //注册用户
 router.post('/register', function (req, res, next) {
-
-    let {name, type, phone, email, introduce, password} = req.body
-    if (!name) {
+    let {username, type, phone, email, introduce, password} = req.body
+    console.log(username, type, phone, email, introduce, password,req.body,req.query)
+    if (!username) {
         responseClient(res, 400, 2, "用户名不可为空")
         return;
     }
@@ -34,7 +34,7 @@ router.post('/register', function (req, res, next) {
         responseClient(res, 400, 2, '密码不可为空');
         return;
     }
-    User.findOne({name: name})
+    User.findOne({username: username})
         .then(data => {
             if (data) {
                 responseClient(res, 200, 1, '用户已存在！');
@@ -43,7 +43,7 @@ router.post('/register', function (req, res, next) {
             //保存到数据库
             let user = new User({
                 email,
-                name,
+                username,
                 password: md5(password + MD5_SUFFIX),
                 phone,
                 type,
@@ -63,9 +63,9 @@ router.post('/register', function (req, res, next) {
 
 //登陆
 router.post("/login", function (req, res) {
-    let {name, password} = req.body
-
-    if (!name) {
+    let {username, password} = req.body
+    console.log(username, password)
+    if (!username) {
         responseClient(res, 400, 2, '用户名不可为空');
         return;
     }
@@ -73,12 +73,13 @@ router.post("/login", function (req, res) {
         responseClient(res, 400, 2, '密码不可为空');
         return;
     }
-    User.findOne({name, password: md5(password + MD5_SUFFIX)}).then(userInfo => {
+    User.findOne({username, password: md5(password + MD5_SUFFIX)}).then(userInfo => {
         // console.log(22222,userInfo)
         if (userInfo) {
             //登陆成功后设置session
             req.session.userInfo = userInfo;
-            responseClient(res, 200, 0, "登陆成功")
+            let data = {token:"admin-token"}
+            responseClient(res, 200, 0, "登陆成功",data)
         } else {
             responseClient(res, 400, 0, "登陆失败")
 
@@ -99,7 +100,7 @@ exports.userInfo = (req, res) => {
 
 //更新用户信息
 router.post("/update", function (req, res) {
-    let {id, name, type, phone, email, introduce, password} = req.body
+    let {id, username, type, phone, email, introduce, password} = req.body
     User.update({'id': id}, req.body, function (err, data) {
         if (err) {
             responseClient(res, 400, 2, "用户名不存在")
@@ -115,16 +116,16 @@ router.post("/update", function (req, res) {
 
 //用户列表
 router.get("/list", function (req, res) {
-    let {name, type, pageSize, currentPage} = req.query
-    console.log(name, type, pageSize, currentPage)
+    let {username, type, pageSize, currentPage} = req.query
+    console.log(username, type, pageSize, currentPage)
     currentPage = parseInt(currentPage)
     pageSize = parseInt(pageSize)
 
     let sort = {'creat_time': -1};        //排序（按登录时间倒序）
     let skip_num = (currentPage - 1) * pageSize;   //跳过数
     let connection = {}
-    if (name) {
-        connection["name"] = name
+    if (username) {
+        connection["name"] = username
     }
     if (type) {
         connection["age"] = type
@@ -134,7 +135,7 @@ router.get("/list", function (req, res) {
             console.log("Error:" + err);
         } else {
             let fields = {
-                name: 1,
+                username: 1,
                 type: 1,
                 phone: 1,
                 email: 1,

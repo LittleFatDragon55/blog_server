@@ -41,12 +41,12 @@ const articleSchema = new mongoose.Schema({
     origin: { type: Number, default: 0 },
 
     // 文章标签
-    // tags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag', required: true }],
+    tags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'tags', required: true }],
     //
     // comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment', required: true }],
     //
     // // 文章分类 关联表
-    // category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }],
+    category: [{ type: mongoose.Schema.Types.ObjectId, ref: 'category', required: true }],
 
     // 点赞的用户
     like_users: [
