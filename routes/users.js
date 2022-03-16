@@ -125,7 +125,7 @@ router.get("/list", function (req, res) {
     let skip_num = (currentPage - 1) * pageSize;   //跳过数
     let connection = {}
     if (username) {
-        connection["name"] = username
+        connection["username"] = username
     }
     if (type) {
         connection["age"] = type

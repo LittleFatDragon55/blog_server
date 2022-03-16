@@ -4,7 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const session = require("express-session")
-var bodyParser = require('body-parser')
+// let bodyParser = require('body-parser')
 // import 等语法要用到 babel 支持
 // require('babel-register');
 require('babel-register')({
