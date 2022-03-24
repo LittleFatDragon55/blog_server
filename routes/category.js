@@ -70,7 +70,7 @@ router.get("/list_category", function (req, res) {
     let sort = {'creat_time': -1};        //排序（按登录时间倒序）
     let skip_num = (currentPage - 1) * pageSize;   //跳过数
 
-    Category.count(conditions, function (err, total) {
+    Category.countDocuments(conditions, function (err, total) {
 
         if (err) {
             console.log("Error:" + err);

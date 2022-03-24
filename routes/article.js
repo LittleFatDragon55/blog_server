@@ -198,7 +198,7 @@ router.get("/list", function (req, res) {
                         })
                     }
                     responseData.list = result
-                    responseData.count =result.length
+                    responseData.count = result.length
                     responseClient(res, 200, 0, "返回成功", responseData)
                 }
             }).populate([{path: 'tags'}, {path: "comments"}, {path: "category"}]).exec((err, doc) => {
@@ -371,10 +371,21 @@ router.get("/article_list", function (req, res) {
 //文章详情
 router.get("/article_detail", function (req, res) {
     let id = req.query.id;
-
-    Article.findOne({_id: id}).then(data => {
-        responseClient(res, 200, 0, '返回成功', data);
-
+    Article.findOne({_id: id},(Error,data)=>{
+        if(Error){
+            console.log(Error)
+        }else{
+            if(data){
+                data.meta.views = data.meta.views + 1
+                Article.updateOne({_id: id}, {meta: data.meta}).then(result => {
+                    responseClient(res, 200, 0, '返回成功', data);
+                }).catch(err=>{
+                    console.log(err)
+                })
+            }
+        }
+    }).populate([{path: 'tags'}, {path: "comments"}, {path: "category"}]).exec((err, doc) => {
+        // console.log("doc:",doc)
     })
 
 

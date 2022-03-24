@@ -1,6 +1,6 @@
 const {mongoose} = require("../core/mongodb.js");
 const autoIncrement = require("mongoose-auto-increment")
-
+const moment = require("moment")
 //评论模型
 const commentSchema = new mongoose.Schema({
     //评论的文章ID
@@ -15,7 +15,7 @@ const commentSchema = new mongoose.Schema({
     //父评论的用户信息
     user: {
         user_id: {type: mongoose.Schema.Types.ObjectId},
-        name: {type: String, required: true, default: ""},
+        username: {type: String, required: true, default: ""},
         //用户类型 0：博主 1：其他用户
         type:{type:Number,default:1},
         //头像
@@ -26,7 +26,7 @@ const commentSchema = new mongoose.Schema({
         {
             user: {
                 user_id: {type: mongoose.Schema.Types.ObjectId},
-                name: {type: String, required: true, default: ""},
+                username: {type: String, required: true, default: ""},
                 //用户类型 0：博主 1：其他用户
                 type:{type:Number,default:1},
                 //头像
@@ -37,7 +37,7 @@ const commentSchema = new mongoose.Schema({
                 user_id: { type: mongoose.Schema.Types.ObjectId },
 
                 // 名字
-                name: { type: String, required: true, default: '' },
+                username: { type: String, required: true, default: '' },
 
                 // 用户类型 0：博主 1：其他用户
                 type: { type: Number, default: 1 },
@@ -55,7 +55,7 @@ const commentSchema = new mongoose.Schema({
             state: { type: Number, default: 1 },
 
             // 创建日期
-            create_time: { type: Date, default: Date.now },
+            create_time: { type: String, default: () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss') },
         }
     ],
     // 状态 => 0 待审核 / 1 通过正常 / -1 已删除 / -2 垃圾评论
@@ -65,10 +65,10 @@ const commentSchema = new mongoose.Schema({
     is_handle: { type: Number, default: 2 },
 
     // 创建日期
-    create_time: { type: Date, default: Date.now },
+    create_time: { type: String, default: () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss') },
 
     // 最后修改日期
-    update_time: { type: Date, default: Date.now },
+    update_time: { type: String, default: () => moment(new Date()).format('YYYY-MM-DD HH:mm:ss')  },
 })
 autoIncrement.initialize(mongoose.connection)//初始化一下，避免自增ID配置报错
 // 自增 ID 插件配置

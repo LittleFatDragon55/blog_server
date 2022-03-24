@@ -15,6 +15,7 @@ const usersRouter = require('./routes/users');
 const articleRouter = require('./routes/article');
 const categoryRouter = require('./routes/category');
 const tagRouter = require('./routes/tag');
+const commentRouter = require('./routes/comment')
 
 const app = express();
 const cors = require('cors');
@@ -23,7 +24,12 @@ app.use(cors({
         origin: "*",
     })
 );
+app.use(express.static('public'))//将 public 目录下文件可以对外开放
 
+const multiparty= require('connect-multiparty');
+
+// var mutipartMiddeware = mutipart();
+app.use(multiparty({uploadDir:'./public/images'}));
 const mongodb = require('./core/mongodb');
 
 // data server
@@ -38,6 +44,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 // app.all("*",function(req,res,next){
 //     //设置允许跨域的域名，*代表允许任意域名跨域
@@ -80,7 +87,7 @@ app.use('/users', usersRouter);
 app.use('/article', articleRouter);
 app.use('/category', categoryRouter);
 app.use('/tag', tagRouter);
-
+app.use('/comment', commentRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

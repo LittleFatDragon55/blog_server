@@ -68,7 +68,7 @@ router.get("/list_tag", function (req, res) {
     if (name) {
         connection["name"] = name
     }
-    Tag.count(connection, function (err, total) {
+    Tag.countDocuments(connection, function (err, total) {
         if (err) {
             console.log("Error:" + err);
         } else {

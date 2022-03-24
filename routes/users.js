@@ -4,6 +4,10 @@ const express = require('express');
 const router = express.Router();
 const User = require("../models/user")
 const MD5_SUFFIX = "123"
+const multiparty= require('connect-multiparty');
+const multipartyMiddeware = multiparty();
+const fs = require("fs")
+
 // const  {responseClient, md5 } = require("../util/util")
 /* GET users listing. */
 // router.get('/:name', function (req, res, next) {
@@ -24,8 +28,9 @@ router.get('/', function (req, res, next) {
 });
 //注册用户
 router.post('/register', function (req, res, next) {
-    let {username, type, phone, email, introduce, password} = req.body
-    console.log(username, type, phone, email, introduce, password,req.body,req.query)
+    let {username, type, phone, email, introduce, password,avatar} = req.body
+    // console.log(md5(password + MD5_SUFFIX))
+    // console.log(username, type, phone, email, introduce, password,req.body,req.query)
     if (!username) {
         responseClient(res, 400, 2, "用户名不可为空")
         return;
@@ -48,6 +53,7 @@ router.post('/register', function (req, res, next) {
                 phone,
                 type,
                 introduce,
+                avatar
             });
             user.save().then(data => {
                 responseClient(res, 200, 0, '注册成功', data);
@@ -64,7 +70,7 @@ router.post('/register', function (req, res, next) {
 //登陆
 router.post("/login", function (req, res) {
     let {username, password} = req.body
-    console.log(username, password)
+    // console.log(username, password,md5(password + MD5_SUFFIX))
     if (!username) {
         responseClient(res, 400, 2, '用户名不可为空');
         return;
@@ -73,12 +79,12 @@ router.post("/login", function (req, res) {
         responseClient(res, 400, 2, '密码不可为空');
         return;
     }
-    User.findOne({username, password: md5(password + MD5_SUFFIX)}).then(userInfo => {
-        // console.log(22222,userInfo)
+    User.findOne({ password: md5(password + MD5_SUFFIX)}).then(userInfo => {
+        console.log(22222,userInfo)
         if (userInfo) {
             //登陆成功后设置session
             req.session.userInfo = userInfo;
-            let data = {token:"admin-token"}
+            let data = {token:"admin-token",userInfo:userInfo}
             responseClient(res, 200, 0, "登陆成功",data)
         } else {
             responseClient(res, 400, 0, "登陆失败")
@@ -130,7 +136,7 @@ router.get("/list", function (req, res) {
     if (type) {
         connection["age"] = type
     }
-    User.count(connection, function (err, total) {
+    User.countDocuments(connection, function (err, total) {
         if (err) {
             console.log("Error:" + err);
         } else {
@@ -142,6 +148,7 @@ router.get("/list", function (req, res) {
                 introduce: 1,
                 id: 1,
                 create_time: 1,
+                avatar:1
             };
             // responseClient(res, 200, 0, '返回成功',total);
             User.find(connection,fields).skip(skip_num).limit(pageSize).sort(sort).exec(function (err, data) {
@@ -198,4 +205,13 @@ router.post("/delete", function (req, res) {
 })
 
 
+router.post('/upload',multipartyMiddeware,function (req,res) {
+    //这里打印可以看到接收到文件的信息。
+    console.log(req.body,req.files)
+    fs.rename(req.files.file.path,"./public/images/"+req.files.file.name,err=>{
+        console.log(err)
+    })//重命名
+    responseClient(res, 200, 0, '删除成功');
+
+});
 module.exports = router;
